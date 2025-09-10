@@ -14,14 +14,16 @@ namespace Assets.Scripts.Dinosaur
         }
 
 
-        public async Task runState()
+        public void runState()
         {
-            State nextState = await currentState?.runCurrentState(_ctx);
+            Debug.Log($"Running current state: {currentState.GetType()}");
+            State nextState = currentState?.RunCurrentState(_ctx);
             if (nextState != null)
             {
                 SwitchToNextState(nextState);
             }
         }
+
 
         private void SwitchToNextState(State nextState)
         {

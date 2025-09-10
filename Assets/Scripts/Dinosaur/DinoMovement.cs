@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
-using GLTFast;
+using PlasticGui;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -18,14 +19,30 @@ namespace Assets.Scripts.Dinosaur
         }
 
 
-        public async Task MoveTo(Vector3 pos)
+        public bool MoveTo(Vector3 pos)
         {
-            while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
-            {
-                await Task.Yield();
-            }
-            agent.SetDestination(pos);
+            Debug.Log($"[DinoMovement] moving to {pos.x} {pos.y} {pos.z}");
 
+            //check for agent
+            if (!agent)
+            {
+                Debug.LogError("[DinoMovement.MoveTo] no NavMeshAgent, cannot move to position");
+                return false;
+            }
+
+            if (agent.remainingDistance <= agent.stoppingDistance)
+            {
+                bool set = agent.SetDestination(pos);
+                return true;
+            }
+
+            if (agent.pathStatus == NavMeshPathStatus.PathInvalid)
+            {
+                Debug.Log("[DinoMovement.MoveTo] Path invalid");
+                return false;
+            }
+
+            return false;
         }
 
         public void SetSpeed(float Speed)

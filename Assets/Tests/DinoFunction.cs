@@ -3,14 +3,25 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Assets.Scripts.Dinosaur;
 
 public class DinoFunction
 {
+    GameObject dinosaur;
     // A Test behaves as an ordinary method
-    [Test]
-    public void NewTestScriptSimplePasses()
+    [SetUp]
+    public void SetUp()
     {
-        // Use the Assert class to test conditions
+
+        dinosaur = new();
+        dinosaur.AddComponent<DinoController>();
+        dinosaur.AddComponent<DinoMovement>();
+        dinosaur.AddComponent<DinoSensors>();
+    }
+    [Test]
+    public void StateWaitsTillAsyncDone()
+    {
+
     }
 
     // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
@@ -23,3 +34,4 @@ public class DinoFunction
         yield return null;
     }
 }
+
