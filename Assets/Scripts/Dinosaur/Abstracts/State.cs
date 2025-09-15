@@ -1,12 +1,23 @@
 using System;
 using System.Threading.Tasks;
+using Codice.CM.WorkspaceServer;
 using UnityEngine;
 
-namespace Assets.Scripts.Dinosaur {
-    public abstract class State
+namespace Assets.Scripts.Dinosaur.Abstracts {
+    public abstract class State : IDisposable
     {
+        protected DinoContext ctx;
+        protected string animation;
 
-        public State RunCurrentState(DinoContext ctx)
+        public string Animation => animation;
+
+        protected bool shouldChange;
+
+        public State(DinoContext context)
+        {
+            ctx = context; 
+        }
+        public State RunCurrentState()
         {
             try
             {
@@ -16,7 +27,7 @@ namespace Assets.Scripts.Dinosaur {
                     return this;
                 }
 
-                bool shouldChange = RunLogic(ctx);
+                RunLogic();
 
                 if (shouldChange)
                 {
@@ -40,11 +51,14 @@ namespace Assets.Scripts.Dinosaur {
                 return null;
             }
         }
-
-        protected abstract bool RunLogic(DinoContext ctx);
+        protected abstract void RunLogic();
 
         protected abstract State ReturnNextState();
-}
 
+        public void Dispose()
+        {
 
+        }
+
+    }
 }

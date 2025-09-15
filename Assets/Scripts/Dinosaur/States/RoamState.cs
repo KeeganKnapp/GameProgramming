@@ -2,36 +2,63 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using UnityEngine;
+using Assets.Scripts.Dinosaur.Abstracts;
 
-namespace Assets.Scripts.Dinosaur
+namespace Assets.Scripts.Dinosaur.States
 {
     public class RoamState : State
     {
         float MaxRoamRadius = 100.0f;
-        protected override bool RunLogic(DinoContext ctx)
+        bool pathSet = false;
+
+        bool shouldBeSuspicious;
+
+        public RoamState(DinoContext context) : base(context)
         {
-
-                UnityEngine.Vector4 randomOffset = UnityEngine.Random.insideUnitCircle * 100;
-                UnityEngine.Vector3 randomPosition =
-                    new UnityEngine.Vector3(ctx.Self.transform.position.x, 0.0f, ctx.Self.transform.position.z)
-                    + new UnityEngine.Vector3(randomOffset.x, 0.0f, randomOffset.y);
-
-                randomPosition.y = ctx.Terrain.SampleHeight(randomPosition);
-
-                Debug.Log($"[Roam]: Moving to {randomPosition.x}, {randomPosition.y}, {randomPosition.z}");
-                ctx.DinoMovement.SetSpeed(5f);
-                ctx.DinoMovement.MoveTo(randomPosition);
-
-                //returns false always, switch to true depending on what conditions are
-                //met to switch states
-                return false;
+            ctx.DinoMovement.Speed = 10f;
+            ctx.DinoMovement.Acceleration = 10f;
+            ctx.DinoMovement.StoppingDistance = 10f;
         }
+
+        protected override void RunLogic()
+        {
+            Debug.Log($"Remaining distance {ctx.DinoMovement.RemainingDistance}");
+
+            //sees player?
+            if (ctx.DinoSensors.SeesPlayer)
+            {
+                shouldBeSuspicious = true;
+                shouldChange = true;
+            }
+            //else set path to move to
+            else if (ctx.DinoMovement.RemainingDistance <= ctx.DinoMovement.StoppingDistance)
+            {
+                if (!pathSet)
+                {
+                    var randomPosition = Helper.RandomLocation(ctx.Self, ctx.Terrain, 100f, 20f);
+                    Debug.Log($"[Roam]: Moving to {randomPosition.x}, {randomPosition.y}, {randomPosition.z}");
+                    pathSet = ctx.DinoMovement.MoveTo(randomPosition);
+                    ctx.HeadRig.SetTargetLocation(randomPosition);
+                    shouldChange = false;
+                }
+                else
+                {
+                    shouldChange = true;
+                }
+            }
+        }
+
+        
 
         protected override State ReturnNextState()
         {
             //returns this as a place holder
             //add more states up top to swap to based on logic in this function
-            return this;
+            Dispose();
+            if (shouldBeSuspicious)
+                return new ChaseState(ctx);
+            else
+                return new IdleState(ctx);
         }
     }
 }

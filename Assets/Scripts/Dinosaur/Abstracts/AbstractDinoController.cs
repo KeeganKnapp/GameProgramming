@@ -1,28 +1,38 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using PlasticPipe.PlasticProtocol.Messages;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Scripting;
+using UnityEngine.Animations.Rigging;
+using System.Numerics;
 
-namespace Assets.Scripts.Dinosaur
+namespace Assets.Scripts.Dinosaur.Abstracts
 {
     public abstract class AbstractDinoController : MonoBehaviour
     {
         [SerializeField] protected Transform player;
         [SerializeField] protected Terrain terrain;
-        protected DinoContext dinoContext;
+
+        public DinoContext dinoContext;
         protected DinoStateMachine dinoStateMachine;
         void Awake()
         {
+
             Debug.Log("Waking up dino controller!");
             dinoContext = new DinoContext
             {
                 Self = transform,
+                LookTarget = GameObject.Find("LookTarget"),
                 DinoSensors = GetComponent<DinoSensors>(),
                 DinoMovement = GetComponent<DinoMovement>(),
                 Animator = GetComponent<Animator>(),
-                Player = player,
-                Terrain = terrain
+                HeadRig = this.GetComponentInChildren<HeadRig>(),
+                SelfObject = this.gameObject,
+                Player = GameObject.Find("Player").transform,
+                Terrain = Terrain.activeTerrain
             };
 
             dinoStateMachine = new DinoStateMachine(dinoContext);
@@ -30,25 +40,17 @@ namespace Assets.Scripts.Dinosaur
         protected virtual void Update()
         {
             Animate();
-            if (dinoStateMachine == null)
-            {
-                Debug.LogError("[DinoController] State machine is null, cannot update");
-            }
-            else if (dinoContext.DinoMovement == null)
-            {
-                Debug.LogError("[DinoController] Movement script is null, cannot move");
-            }
-            else if (dinoContext.Animator == null)
-            {
-                Debug.LogError("[DinoController] Animator is null, cannot animate");
-            }
             dinoStateMachine.runState();
         }
 
-        public void Animate()
+
+        protected void Animate()
         {
-            dinoContext.Animator.Play("Walk");
+            dinoContext.Animator.SetFloat("Acceleration", dinoContext.DinoMovement.Acceleration);
+            dinoContext.Animator.SetFloat("MoveSpeed", dinoContext.DinoMovement.VelocityMag);
         }
+
+
     }
 
 }

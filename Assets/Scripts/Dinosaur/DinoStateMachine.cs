@@ -1,23 +1,22 @@
 using System.Threading.Tasks;
 using UnityEngine;
-
+using Assets.Scripts.Dinosaur.Abstracts;
+using Assets.Scripts.Dinosaur.States;
 namespace Assets.Scripts.Dinosaur
 {
     public class DinoStateMachine
     {
-
-        public State currentState = new RoamState();
-        private DinoContext _ctx;
+        public State currentState;
         public DinoStateMachine(DinoContext ctx)
         {
-            _ctx = ctx;
+            currentState = new IdleState(ctx);
         }
 
 
         public void runState()
         {
             Debug.Log($"Running current state: {currentState.GetType()}");
-            State nextState = currentState?.RunCurrentState(_ctx);
+            State nextState = currentState?.RunCurrentState();
             if (nextState != null)
             {
                 SwitchToNextState(nextState);
