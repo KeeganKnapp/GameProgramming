@@ -20,15 +20,24 @@ namespace Assets.Scripts.Dinosaur.States
 
         private double randomActionTimeSeconds;
 
+        private bool shouldChase = false;
+        private bool shouldRoam = false;
+
         public IdleState(DinoContext context) : base(context)
         {
             startTime = DateTime.Now.TimeOfDay.TotalSeconds;
-            randomActionTimeSeconds = UnityEngine.Random.Range(3, 10);
+//            randomActionTimeSeconds = UnityEngine.Random.Range(3, 10);
 
+            randomActionTimeSeconds = UnityEngine.Random.Range(3, 5);
         }
         protected override void RunLogic()
         {
             double nowTime = DateTime.Now.TimeOfDay.TotalSeconds;
+            if (dinoSensors.CanSeePlayer)
+            {
+                shouldChange = true;
+                shouldChase = true;
+            }
             if (nowTime - startTime > randomActionTimeSeconds)
             {
                 RunRandomAction();
@@ -42,21 +51,24 @@ namespace Assets.Scripts.Dinosaur.States
             switch (idleAction)
             {
                 case IdleAction.LookLeft:
-                    ctx.HeadRig.SetTargetLocation(Helper.RandomLocation(ctx.Self, ctx.Terrain));
+                    ctx.LookTarget.SetTargetLocation(Helper.RandomLocation(ctx.Self, ctx.Terrain));
                     break;
                 case IdleAction.LookRight:
-                    ctx.HeadRig.SetTargetLocation(Helper.RandomLocation(ctx.Self, ctx.Terrain));
+                    ctx.LookTarget.SetTargetLocation(Helper.RandomLocation(ctx.Self, ctx.Terrain));
                     break;
                 case IdleAction.Roam:
                     shouldChange = true;
+                    shouldRoam = true;
                     break;
             }
             resetActionTime();
         }
+
         private void resetActionTime()
         {
             startTime = DateTime.Now.TimeOfDay.TotalSeconds;
         }
+
         public static IdleAction GetRandomAction()
         {
             System.Random rng = new System.Random();
@@ -69,7 +81,10 @@ namespace Assets.Scripts.Dinosaur.States
             Dispose();
             if (shouldChange)
             {
-                return new RoamState(ctx);
+                if(shouldChase)
+                    return new ChaseState(ctx);
+                else
+                    return new RoamState(ctx);
             }
             else
             {

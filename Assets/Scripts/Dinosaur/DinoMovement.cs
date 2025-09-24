@@ -21,7 +21,6 @@ namespace Assets.Scripts.Dinosaur
         public float Speed { get { return agent.speed; } set { agent.speed = value; } }
         public float Acceleration { get { return agent.acceleration; } set { agent.acceleration = value; } }
         public float VelocityMag { get { return agent.velocity.magnitude; } set { } }
-
         public bool AutoBraking { get { return agent.autoBraking; } set { agent.autoBraking = value; } }
         public float DesiredSlowDownDistance { get; set; }
 

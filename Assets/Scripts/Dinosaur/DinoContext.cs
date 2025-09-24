@@ -8,13 +8,12 @@ namespace Assets.Scripts.Dinosaur
     {
         public Transform Self { get; set; }
 
-        public GameObject LookTarget { get; set; }
+        public LookTarget LookTarget { get; set; }
         public GameObject SelfObject { get; set; }
         public DinoSensors DinoSensors { get; set; }
 
         public DinoMovement DinoMovement { get; set; }
 
-        public HeadRig HeadRig { get; set; }
         public Animator Animator { get; set; }
 
         public Transform Player { get; set; }

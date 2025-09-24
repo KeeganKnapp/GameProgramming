@@ -1,18 +1,32 @@
+using System;
 using UnityEngine;
 
 public static class Helper
 {
-    public static Vector3 RandomLocation(Transform self, Terrain terrain, float radius = 50f, float minRadius = 20f)
+    public static Vector3 RandomLocation(
+        Transform self, Terrain terrain,
+        float maxAngle = 90f, float radius = 100f, float minRadius = 20f)
     {
-        UnityEngine.Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * Random.Range(minRadius, radius);
-        
-        UnityEngine.Vector3 randomPosition =
-            new UnityEngine.Vector3(self.position.x, 0.0f, self.position.z)
-            + new UnityEngine.Vector3(randomOffset.x, 0.0f, randomOffset.y);
+        // Use horizontal forward only (ignore pitch)
+        Vector3 fwdXZ = Vector3.ProjectOnPlane(self.forward, Vector3.up).normalized;
+        if (fwdXZ.sqrMagnitude < 1e-6f) fwdXZ = self.right; // fallback
 
-        randomPosition.y = terrain.SampleHeight(randomPosition);
+        // Yaw within ±maxAngle/2 around the UP axis, not around self.forward
+        float half = maxAngle * 0.5f;
+        float yaw = UnityEngine.Random.Range(-half, half);
+        Vector3 dir = Quaternion.AngleAxis(yaw, Vector3.up) * fwdXZ;
 
-        return randomPosition;
-    }    
+        // Distance within [minRadius, radius]
+        float dist = UnityEngine.Random.Range(minRadius, radius);
+
+        // Position in world space
+        Vector3 pos = self.position + dir * dist;
+
+        // Terrain height (account for terrain world Y)
+        float terrainBaseY = terrain.GetPosition().y;
+        pos.y = terrain.SampleHeight(pos) + terrainBaseY;
+
+        return pos;
+    }
 
 }

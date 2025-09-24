@@ -17,6 +17,8 @@ namespace Assets.Scripts.Dinosaur.Abstracts
         [SerializeField] protected Terrain terrain;
 
         public DinoContext dinoContext;
+        private DinoMovement dinoMovement;
+        private Animator animator;
         protected DinoStateMachine dinoStateMachine;
         void Awake()
         {
@@ -25,17 +27,19 @@ namespace Assets.Scripts.Dinosaur.Abstracts
             dinoContext = new DinoContext
             {
                 Self = transform,
-                LookTarget = GameObject.Find("LookTarget"),
+                LookTarget = GameObject.Find("LookTarget").GetComponent<LookTarget>(),
                 DinoSensors = GetComponent<DinoSensors>(),
                 DinoMovement = GetComponent<DinoMovement>(),
                 Animator = GetComponent<Animator>(),
-                HeadRig = this.GetComponentInChildren<HeadRig>(),
                 SelfObject = this.gameObject,
                 Player = GameObject.Find("Player").transform,
                 Terrain = Terrain.activeTerrain
             };
 
             dinoStateMachine = new DinoStateMachine(dinoContext);
+
+            animator = GetComponent<Animator>();
+            dinoMovement = GetComponent<DinoMovement>();
         }
         protected virtual void Update()
         {
@@ -46,8 +50,8 @@ namespace Assets.Scripts.Dinosaur.Abstracts
 
         protected void Animate()
         {
-            dinoContext.Animator.SetFloat("Acceleration", dinoContext.DinoMovement.Acceleration);
-            dinoContext.Animator.SetFloat("MoveSpeed", dinoContext.DinoMovement.VelocityMag);
+            animator.SetFloat("Acceleration", dinoMovement.Acceleration);
+            animator.SetFloat("MoveSpeed", dinoMovement.VelocityMag);
         }
 
 

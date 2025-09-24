@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using UnityEngine;
 using Assets.Scripts.Dinosaur.Abstracts;
+using UnityEditor.Experimental.GraphView;
 
 namespace Assets.Scripts.Dinosaur.States
 {
@@ -15,30 +16,30 @@ namespace Assets.Scripts.Dinosaur.States
 
         public RoamState(DinoContext context) : base(context)
         {
-            ctx.DinoMovement.Speed = 10f;
-            ctx.DinoMovement.Acceleration = 10f;
-            ctx.DinoMovement.StoppingDistance = 10f;
+            dinoMovement.Speed = 10f;
+            dinoMovement.Acceleration = 10f;
+            dinoMovement.StoppingDistance = 10f;
         }
 
         protected override void RunLogic()
         {
-            Debug.Log($"Remaining distance {ctx.DinoMovement.RemainingDistance}");
+            Debug.Log($"Remaining distance {dinoMovement.RemainingDistance}");
 
             //sees player?
-            if (ctx.DinoSensors.SeesPlayer)
+            if (dinoSensors.CanSeePlayer)
             {
                 shouldBeSuspicious = true;
                 shouldChange = true;
             }
             //else set path to move to
-            else if (ctx.DinoMovement.RemainingDistance <= ctx.DinoMovement.StoppingDistance)
+            else if (dinoMovement.RemainingDistance <= ctx.DinoMovement.StoppingDistance)
             {
                 if (!pathSet)
                 {
-                    var randomPosition = Helper.RandomLocation(ctx.Self, ctx.Terrain, 100f, 20f);
+                    var randomPosition = Helper.RandomLocation(ctx.Self, ctx.Terrain, radius:100f, minRadius:20f, maxAngle:120);
                     Debug.Log($"[Roam]: Moving to {randomPosition.x}, {randomPosition.y}, {randomPosition.z}");
-                    pathSet = ctx.DinoMovement.MoveTo(randomPosition);
-                    ctx.HeadRig.SetTargetLocation(randomPosition);
+                    pathSet = dinoMovement.MoveTo(randomPosition);
+                    ctx.LookTarget.SetTargetLocation(randomPosition);
                     shouldChange = false;
                 }
                 else
@@ -56,7 +57,10 @@ namespace Assets.Scripts.Dinosaur.States
             //add more states up top to swap to based on logic in this function
             Dispose();
             if (shouldBeSuspicious)
+            {
+                ctx.Animator.SetTrigger("Roar");
                 return new ChaseState(ctx);
+            }
             else
                 return new IdleState(ctx);
         }

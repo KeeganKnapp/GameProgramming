@@ -7,15 +7,17 @@ namespace Assets.Scripts.Dinosaur.Abstracts {
     public abstract class State : IDisposable
     {
         protected DinoContext ctx;
-        protected string animation;
 
-        public string Animation => animation;
+        protected DinoMovement dinoMovement;
+        protected DinoSensors dinoSensors;
 
         protected bool shouldChange;
 
         public State(DinoContext context)
         {
-            ctx = context; 
+            ctx = context;
+            dinoMovement = ctx.DinoMovement;
+            dinoSensors = ctx.DinoSensors;
         }
         public State RunCurrentState()
         {
