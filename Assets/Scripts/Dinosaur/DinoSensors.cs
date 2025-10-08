@@ -72,13 +72,17 @@ namespace Assets.Scripts.Dinosaur
             }
             else // Add new location if not one nearby
             {
-                float distToPlayer = Vector3.Distance(eyes.position, player.transform.position);
-                var confidence = Mathf.Clamp01(1.0f - distToPlayer / sightRange);
-                Debug.Log($"Distance to Player: {distToPlayer}, Sight Range: {sightRange}, Confidence: {confidence}");
+                float dist = Vector3.Distance(eyes.position, player.transform.position);
+                float distFactor = Mathf.InverseLerp(sightRange, 0f, dist);           // closer -> higher
+                Vector3 dir = (player.transform.position - eyes.position).normalized;
+                float ang  = Vector3.Angle(eyes.forward, dir);
+                float facingFactor = (ang <= fovDegrees * 0.5f) ? 1.0f : 0.7f;        // small boost if centered
+                float initialConf = Mathf.Clamp01(0.25f + 0.6f * distFactor) * facingFactor;
+
                 suspiciousLocations.Add(new SuspiciousLocation(player.transform.position, SuspicionType.Sight)
                 {
                     Radius = startSuspicionRadius,
-                    Confidence = confidence
+                    Confidence = initialConf
                 });
             }
         }
