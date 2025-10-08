@@ -9,7 +9,6 @@ namespace Assets.Scripts.Dinosaur.States
 {
     public class ChaseState : State
     {
-        float MaxRoamRadius = 100.0f;
 
         public ChaseState(DinoContext context) : base(context)
         {
@@ -22,8 +21,8 @@ namespace Assets.Scripts.Dinosaur.States
 
         protected override void RunLogic()
         {
-            dinoMovement.MoveTo(ctx.Player.position, true);
-            ctx.LookTarget.SetTargetLocation(ctx.Player.position);
+            dinoMovement.MoveTo(ctx.PlayerObject.transform.position, true);
+            ctx.LookTarget.SetTargetLocation(ctx.PlayerObject.transform.position);
             //returns false always, switch to true depending on what conditions are
             //met to switch states
             shouldChange = false;

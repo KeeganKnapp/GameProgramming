@@ -16,10 +16,11 @@ namespace Assets.Scripts.Dinosaur
 
         public Animator Animator { get; set; }
 
-        public Transform Player { get; set; }
+        public GameObject PlayerObject { get; set; }
 
         public Terrain Terrain { get; set; }
 
+        public List<SuspiciousLocation> SuspiciousLocations { get; set; } = new List<SuspiciousLocation>();
     }
 
 

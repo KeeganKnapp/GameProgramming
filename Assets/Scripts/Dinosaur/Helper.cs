@@ -29,4 +29,20 @@ public static class Helper
         return pos;
     }
 
+    public static Vector3 RandomLocationWithinRadiusNoDirection(
+        Vector3 self, Terrain terrain, float radius = 100f, float minRadius = 20f)
+    {
+        // Random point within a sphere
+        Vector3 randomPoint = UnityEngine.Random.insideUnitSphere * radius;
+        randomPoint.y = 0; // Flatten to 2D
+
+        // Position in world space
+        Vector3 pos = self + randomPoint;
+
+        // Terrain height (account for terrain world Y)
+        float terrainBaseY = terrain.GetPosition().y;
+        pos.y = terrain.SampleHeight(pos) + terrainBaseY;
+
+        return pos;
+    }
 }

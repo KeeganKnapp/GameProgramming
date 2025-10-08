@@ -20,8 +20,7 @@ namespace Assets.Scripts.Dinosaur.States
 
         private double randomActionTimeSeconds;
 
-        private bool shouldChase = false;
-        private bool shouldRoam = false;
+        private bool shouldBeSuspicious = false;
 
         public IdleState(DinoContext context) : base(context)
         {
@@ -33,10 +32,10 @@ namespace Assets.Scripts.Dinosaur.States
         protected override void RunLogic()
         {
             double nowTime = DateTime.Now.TimeOfDay.TotalSeconds;
-            if (dinoSensors.CanSeePlayer)
+            if (ctx.SuspiciousLocations.Count > 0)
             {
                 shouldChange = true;
-                shouldChase = true;
+                shouldBeSuspicious = true;
             }
             if (nowTime - startTime > randomActionTimeSeconds)
             {
@@ -58,7 +57,6 @@ namespace Assets.Scripts.Dinosaur.States
                     break;
                 case IdleAction.Roam:
                     shouldChange = true;
-                    shouldRoam = true;
                     break;
             }
             resetActionTime();
@@ -81,8 +79,8 @@ namespace Assets.Scripts.Dinosaur.States
             Dispose();
             if (shouldChange)
             {
-                if(shouldChase)
-                    return new ChaseState(ctx);
+                if(shouldBeSuspicious)
+                    return new SuspiciousState(ctx);
                 else
                     return new RoamState(ctx);
             }

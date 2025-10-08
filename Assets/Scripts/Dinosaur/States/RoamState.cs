@@ -9,7 +9,6 @@ namespace Assets.Scripts.Dinosaur.States
 {
     public class RoamState : State
     {
-        float MaxRoamRadius = 100.0f;
         bool pathSet = false;
 
         bool shouldBeSuspicious;
@@ -25,8 +24,8 @@ namespace Assets.Scripts.Dinosaur.States
         {
             Debug.Log($"Remaining distance {dinoMovement.RemainingDistance}");
 
-            //sees player?
-            if (dinoSensors.CanSeePlayer)
+            //suspicious locations?
+            if (ctx.SuspiciousLocations.Count > 0)
             {
                 shouldBeSuspicious = true;
                 shouldChange = true;
@@ -58,8 +57,7 @@ namespace Assets.Scripts.Dinosaur.States
             Dispose();
             if (shouldBeSuspicious)
             {
-                ctx.Animator.SetTrigger("Roar");
-                return new ChaseState(ctx);
+                return new SuspiciousState(ctx);
             }
             else
                 return new IdleState(ctx);

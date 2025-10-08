@@ -10,7 +10,7 @@ public class LookTarget : MonoBehaviour
     public float heightOffset = 1.6f;   
     public float smoothTime = 0.08f;     
 
-    private Vector3 targetWorld;       
+    public Vector3 targetWorld;       
     private Vector3 vel;                
 
     public void SetTargetLocation(Vector3 worldPosition)

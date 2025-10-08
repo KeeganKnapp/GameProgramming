@@ -32,7 +32,7 @@ namespace Assets.Scripts.Dinosaur.Abstracts
                 DinoMovement = GetComponent<DinoMovement>(),
                 Animator = GetComponent<Animator>(),
                 SelfObject = this.gameObject,
-                Player = GameObject.Find("Player").transform,
+                PlayerObject = GameObject.Find("Player"),
                 Terrain = Terrain.activeTerrain
             };
 
